@@ -22,10 +22,10 @@ Toolkit.run(async tools => {
   }
 
   let version = 'patch'
-  if (messages.map(message => message.includes('BREAKING CHANGE') || message.includes('major')).includes(true)) {
+  if (messages.map(message => message.includes('MAJOR-RELEASE')).includes(true)) {
     version = 'major'
   } else if (messages.map(
-    message => message.toLowerCase().startsWith('feat') || message.toLowerCase().includes('minor')).includes(true)) {
+    message => message.toLowerCase().includes('MINOR-RELEASE')).includes(true)) {
     version = 'minor'
   }
 
@@ -64,9 +64,15 @@ Toolkit.run(async tools => {
 
     const remoteRepo = `https://${process.env.GITHUB_ACTOR}:${process.env.GITHUB_TOKEN}@github.com/${process.env.GITHUB_REPOSITORY}.git`
     // console.log(Buffer.from(remoteRepo).toString('base64'))
-    await tools.runInWorkspace('git', ['tag', newVersion])
-    await tools.runInWorkspace('git', ['push', remoteRepo, '--follow-tags'])
-    await tools.runInWorkspace('git', ['push', remoteRepo, '--tags'])
+
+    if (version !== 'patch') {
+      await tools.runInWorkspace('git', ['tag', newVersion])
+      await tools.runInWorkspace('git', ['push', remoteRepo, '--follow-tags'])
+      await tools.runInWorkspace('git', ['push', remoteRepo, '--tags'])
+    } else {
+      await tools.runInWorkspace('git', ['push', remoteRepo])
+    }
+
   } catch (e) {
     tools.log.fatal(e)
     tools.exit.failure('Failed to bump version')
