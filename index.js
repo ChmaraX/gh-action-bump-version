@@ -25,7 +25,7 @@ Toolkit.run(async tools => {
   if (messages.map(message => message.includes('MAJOR-RELEASE')).includes(true)) {
     version = 'major'
   } else if (messages.map(
-    message => message.toLowerCase().includes('MINOR-RELEASE')).includes(true)) {
+    message => message.includes('MINOR-RELEASE')).includes(true)) {
     version = 'minor'
   }
 
